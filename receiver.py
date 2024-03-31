@@ -1,4 +1,4 @@
-# Receiver.py, Used to decrypt the encrypted message.
+# Receiver.py, Used to decrypt the encrypted file/message.
 
 #import the necessary libraries
 import time
@@ -20,6 +20,9 @@ g = 5 # Generator, you can change just make sure you also change it in sender.py
 
 senderIP = '10.0.0.92' # Set this to the IP of the computer running the sender.py code
 serverPort = 50101 # Set this to the port number the sender.py code is listening on
+
+# Introduction print statement
+print("\nYou are currently running the receiver.py file. This file receives the encrypted file from the sender.py file for decryption.")
 
 # Function to generate Diffie-Hellman private key
 def generate_private_key(p):
@@ -127,9 +130,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Compare shared secrets to make sure they match and update shared_secrets_match
     if shared_secret == sender_shared_secret:
-        print(f"\nShared secrets match: Sender.py secret_{sender_shared_secret} = Receiver.py secret_{shared_secret}")
+        print(f"\nShared secrets match: {sender_shared_secret}(sender.py) = {shared_secret}(receiver.py)")
     else:
-        print(f"\nShared secrets do not match: Sender.py secret_{sender_shared_secret} != Receiver.py secret_{shared_secret}")
+        print(f"\nShared secrets do not match: {sender_shared_secret}(sender.py) != {shared_secret}(receiver.py)")
 
 # # Close the socket
 # client_socket.close()
@@ -155,15 +158,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect((senderIP, serverPort))  # Try to connect to the server
             break  # If the connection is successful, break out of the loop
         except ConnectionRefusedError:
-            print("\nConnection failed to receive encrypted message and IV from sender.py. Trying again in 5 seconds...")
+            print("\nConnection failed to receive encrypted file/message and IV from sender.py. Trying again in 5 seconds...")
             time.sleep(5)  # Wait for 5 seconds before trying again
-    print("Receiving encrypted message and IV from sender.py...")
+    print("Receiving encrypted file/message and IV from sender.py...")
 
     # Receive data until there's no more to receive (for the file)
     time.sleep(3) # Wait for 3 seconds to ensure that the sender has sent the file
     
     encrypted_message = recv_with_length_prefix(client_socket)
-    print("\nReceived Encrypted Message:")
+    print("\nReceived Encrypted File/Message:")
 
     # Receive the IV
     iv = client_socket.recv(16)
@@ -173,7 +176,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     decryptor = cipher.decryptor()
     decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
 
-    print("\nDecrypted Message:", decrypted_message.decode())
+    print("\nDecrypted Message/File:", decrypted_message.decode())
 
     # Close the socket
     client_socket.close()
