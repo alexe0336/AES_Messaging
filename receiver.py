@@ -75,7 +75,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             sender_DH_public_key_bytes,  # The original message that was signed
             padding.PSS(
                 mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=5,
+                salt_length=padding.PSS.MAX_LENGTH,
             ),
             hashes.SHA256(),
         )
