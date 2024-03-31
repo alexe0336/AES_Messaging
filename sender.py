@@ -127,10 +127,10 @@ with conn:
     print("Shared Secret from Sender.py:", shared_secret)
 
     # Send the shared secret to reciever.py
-    conn.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
+    send_with_length_prefix(conn, (shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big')))
 
     # Recieve the shared secret from reciever.py and turn it back into an integer
-    receiver_shared_secret = int.from_bytes(conn.recv(1024), 'big')
+    receiver_shared_secret = recv_with_length_prefix(int.from_bytes(conn.recv(1024), 'big'))
 
     # Compare shared secrets to make sure they match and update shared_secrets_match
     if shared_secret == receiver_shared_secret:
