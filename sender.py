@@ -194,7 +194,7 @@ try:
         try:
             # Sending the encrypted file in chunks
             with open(encrypted_file_path, 'rb') as file:
-                data = file.read
+                data = file.read()
                 send_with_length_prefix(conn,data)
             print("Encrypted file sent")
 
