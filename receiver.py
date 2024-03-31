@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.exceptions import InvalidSignature
 
+
     # Libraries for TCP socket API
 import socket
 
@@ -159,6 +160,7 @@ shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret bac
 print("AES Key:", aes_key)
 
 # Receive data until there's no more to receive (for the file)
+time.sleep(3) # Wait for 3 seconds to ensure that the sender has sent the file
 chunks = []
 while True:
     chunk = client_socket.recv(4096)  # Adjust buffer size as necessary
