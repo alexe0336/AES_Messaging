@@ -81,6 +81,25 @@ else:
     shared_secrets_match = False
     print("Shared secrets do not match")
 
+# Setup HKDF parameters for AES key derivation
+hkdf = HKDF(
+    algorithm=hashes.SHA256(),
+    length=32,
+    salt=0,
+    info=0,
+    backend=default_backend()
+)
+
+# Generate the AES key
+aes_key = hkdf.derive(shared_secret)
+
+# Print the AES key
+print("AES Key:", aes_key)
+
+
+
+
+
 # # Generate RSA key pair
 # private_key_rsa = rsa.generate_private_key(
 #     public_exponent=65537,

@@ -79,3 +79,4 @@ if shared_secret == sender_shared_secret:
 else:
     shared_secrets_match = False
     print("Shared secrets do not match")
+
