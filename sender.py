@@ -60,27 +60,27 @@ with conn:
     receiver_DH_public_key = conn.recv(1024)  # Get receiver.py's public key
     conn.sendall(sender_DH_public_key_bytes)  # Send the sender.py's public key.
 
-# Reverting the public key from bytes back to an integer
-receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
+    # Reverting the public key from bytes back to an integer
+    receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
 
-#Compute the shared secret
-shared_secret = compute_shared_secret(receiver_DH_public_key, sender_DH_private_key, p)
-print("Shared Secret Sender.py:", shared_secret)
+    #Compute the shared secret
+    shared_secret = compute_shared_secret(receiver_DH_public_key, sender_DH_private_key, p)
+    print("Shared Secret Sender.py:", shared_secret)
 
-# Send the shared secret to reciever.py
-conn.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
+    # Send the shared secret to reciever.py
+    conn.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
 
-# Recieve the shared secret from reciever.py and turn it back into an integer
-receiver_shared_secret = int.from_bytes(conn.recv(1024), 'big')
+    # Recieve the shared secret from reciever.py and turn it back into an integer
+    receiver_shared_secret = int.from_bytes(conn.recv(1024), 'big')
 
-# Compare shared secrets to make sure they match and update shared_secrets_match
-if shared_secret == receiver_shared_secret:
-    shared_secrets_match = True
-    print("Shared secrets match")
-else:
-    shared_secrets_match = False
-    print("Shared secrets do not match")
-
+    # Compare shared secrets to make sure they match and update shared_secrets_match
+    if shared_secret == receiver_shared_secret:
+        shared_secrets_match = True
+        print("Shared secrets match")
+    else:
+        shared_secrets_match = False
+        print("Shared secrets do not match")
+        
 # Setup HKDF parameters for AES key derivation
 hkdf = HKDF(
     algorithm=hashes.SHA256(),
