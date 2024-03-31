@@ -77,6 +77,8 @@ public_key_rsa_bytes = public_key_rsa.public_bytes(
     encoding=serialization.Encoding.PEM,
     format=serialization.PublicFormat.SubjectPublicKeyInfo
 )
+# #convert to base64 so it can be sent
+# public_key_rsa_bytes_b64 = base64.b64encode(public_key_rsa_bytes)
 
 print("RSA Public Key:", public_key_rsa_bytes)
 
@@ -108,7 +110,7 @@ conn, addr = server_socket.accept()
 with conn:
     print('Connected by', addr)
 
-    # Get receiver.py's public key
+    # Get receiver.py's DH public key
     receiver_DH_public_key = recv_with_length_prefix(conn)
 
     # Send the RSA Public key

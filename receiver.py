@@ -87,16 +87,17 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Send receiver.py's DH public key to sender.py, will be sent in bytes
     send_with_length_prefix(client_socket, receiver_DH_public_key_bytes)
-    print("test1")
+    print("Sent Receiver.py's Public Key:", receiver_DH_public_key_bytes)
+
     # Receive sender.py's RSA public key
-    sender_signed_DH_public_key = recv_with_length_prefix(client_socket)
-    print("test2")
+    rsa_public_key_bytes = recv_with_length_prefix(client_socket)
+    print("received RSA public key", rsa_public_key_bytes)
     # Receive sender.py's DH public key
     sender_DH_public_key_bytes = recv_with_length_prefix(client_socket)
-    print("test3")
+    print("Received Sender.py's Public Key:", sender_DH_public_key_bytes)
     # Receive sender.py's RSA signed DH public key
-    rsa_public_key_bytes = recv_with_length_prefix(client_socket)
-    print("test4")
+    sender_signed_DH_public_key = recv_with_length_prefix(client_socket)
+    print("Received Sender.py's Signed Public Key:", sender_signed_DH_public_key)
 
     # Convert the RSA public key from bytes back to an RSA public key object
     # Convert bytes back to an RSA public key object
