@@ -182,7 +182,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Receive the IV
     iv = client_socket.recv(16)
-    print("Received IV:", iv)
+    print(f"Received IV: {iv}")
 
     cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
     decryptor = cipher.decryptor()

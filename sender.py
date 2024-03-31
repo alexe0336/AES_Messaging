@@ -199,6 +199,7 @@ try:
             print("Encrypted file sent")
 
             # Sending IV (assuming it's not too large)
+            print(f"Sending IV: {iv}")            
             conn.sendall(iv)
             print("IV sent", iv)
 
