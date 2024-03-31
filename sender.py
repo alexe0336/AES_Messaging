@@ -38,13 +38,6 @@ def compute_shared_secret(other_public_key, private_key, p):
     # shared_secret = other_public_key^private_key mod p
     return pow(other_public_key, private_key, p)
 
-# Share the public key with receiver.py get the receivers public key
-# # Assuming `public_key` is the server's (receiver's) RSA public key
-# public_key_pem = public_key.public_bytes(
-#     encoding=serialization.Encoding.PEM,
-#     format=serialization.PublicFormat.SubjectPublicKeyInfo
-# )
-
 # Generate Diffie-Hellman private key
 sender_DH_private_key = generate_private_key(p)
 # Generate Diffie-Hellman public key
