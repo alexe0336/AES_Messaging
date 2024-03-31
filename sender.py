@@ -25,8 +25,7 @@ iv = b'IVkeyneedstobe16'  # Hardcoded IV key, must be 16 bytes
 port = 50101 # Change port number to whatever you want, just make sure it matches the receiver.py port number
 
 #Introduction print statement
-print("You are currently running the sender.py file. This file sends the encrypted file to the receiver.py file.")
-print("")
+print("\nYou are currently running the sender.py file. This file sends the encrypted file to the receiver.py file for decryption.")
 
 # Function to generate Diffie-Hellman private key
 def generate_private_key(p):
