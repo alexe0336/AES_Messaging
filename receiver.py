@@ -179,6 +179,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             break  # No more data to receive
         chunks.append(chunk)
     encrypted_message = b''.join(chunks)
+    print("Received Encrypted Message:", encrypted_message)
 
     # Receive the IV
     iv = client_socket.recv(16)
