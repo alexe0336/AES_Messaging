@@ -97,7 +97,7 @@ print("AES Key:", aes_key)
 # Encrypting the file with the AES key
 file_path = 'input.txt'
 encrypted_file_path = 'encrypted.txt'
-iv = b'IVkey'  # Hardcoded IV key
+iv = b'IVkeyneedstobe16'  # Hardcoded IV key
 key = aes_key
 
 
