@@ -10,6 +10,8 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
+from cryptography.hazmat.backends import default_backend
 
     # Libraries for TCP socket API
 import socket
@@ -59,6 +61,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     sender_signed_DH_public_key = client_socket.recv(1024)  # Receive sender.py's RSA public key
     rsa_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's signed DH public key
     sender_DH_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's DH public key
+
+    # Convert the RSA public key from bytes back to an RSA public key object
+    # Convert bytes back to an RSA public key object
+    rsa_public_key = load_pem_public_key(rsa_public_key_bytes, backend=default_backend())
 
     # Client verifies the signature
     try:
