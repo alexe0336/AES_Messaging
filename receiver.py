@@ -7,6 +7,10 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
     # Libraries for TCP socket API
 import socket
 
@@ -52,10 +56,28 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             time.sleep(5)  # Wait for 5 seconds before trying again
 
     client_socket.sendall(receiver_DH_public_key_bytes)  # Send the receiver.py's public key
-    sender_DH_public_key = client_socket.recv(1024)  # Receive sender.py's public key
+    sender_signed_DH_public_key = client_socket.recv(1024)  # Receive sender.py's RSA public key
+    rsa_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's signed DH public key
+    sender_DH_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's DH public key
+
+    # Client verifies the signature
+    try:
+        # Verify the signature
+        rsa_public_key_bytes.verify(
+            sender_signed_DH_public_key,
+            sender_DH_public_key_bytes,  # The original message that was signed
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH,
+            ),
+            hashes.SHA256(),
+        )
+        print("Signature is valid.")
+    except InvalidSignature:
+        print("Signature is invalid.")
 
     # Revert the public key from sender.py that is in bytes back to an integer
-    sender_DH_public_key = int.from_bytes(sender_DH_public_key, 'big')
+    sender_DH_public_key = int.from_bytes(sender_DH_public_key_bytes, 'big')
 
     # Compute shared secret key
     shared_secret = compute_shared_secret(sender_DH_public_key, receiver_DH_private_key, p)
@@ -111,4 +133,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     decryptor = cipher.decryptor()
     decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
     print("Decrypted Message:", decrypted_message.decode())
-    

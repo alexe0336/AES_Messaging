@@ -22,6 +22,11 @@ p = 23
 g = 5
 
 shared_secrets_match = False
+
+file_path = 'input.txt'
+encrypted_file_path = 'encrypted.txt'
+iv = b'IVkeyneedstobe16'  # Hardcoded IV key
+
 # Function to generate Diffie-Hellman private key
 def generate_private_key(p):
     from random import randint
@@ -38,12 +43,34 @@ def compute_shared_secret(other_public_key, private_key, p):
     # shared_secret = other_public_key^private_key mod p
     return pow(other_public_key, private_key, p)
 
+# Generate RSA key pair
+private_key_rsa = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048,
+    backend=default_backend()
+)
+
+public_key_rsa = private_key_rsa.public_key()
+#convert the RSA public key to bytes so it can be sent
+public_key_rsa_bytes = public_key_rsa.public_bytes
+
 # Generate Diffie-Hellman private key
 sender_DH_private_key = generate_private_key(p)
 # Generate Diffie-Hellman public key
 sender_DH_public_key = generate_public_key(g, sender_DH_private_key, p)
 # Public key must be converted to bytes before it can be sent
 sender_DH_public_key_bytes = sender_DH_public_key.to_bytes((sender_DH_public_key.bit_length() + 7) // 8, 'big')
+
+#sender.py RSA signs the DH public key
+signed_DH_public_key = private_key_rsa.sign(
+    sender_DH_public_key_bytes,
+    padding.PSS(
+        mgf=padding.MGF1(hashes.SHA256()),
+        salt_length=padding.PSS.MAX_LENGTH
+    ),
+    hashes.SHA256()
+)
+
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(('0.0.0.0', 50101))  # Listen on port 50101
@@ -54,7 +81,9 @@ conn, addr = server_socket.accept()
 with conn:
     print('Connected by', addr)
     receiver_DH_public_key = conn.recv(1024)  # Get receiver.py's public key
-    conn.sendall(sender_DH_public_key_bytes)  # Send the sender.py's public key.
+    conn.sendall(public_key_rsa_bytes)  # Send the RSA Public key
+    conn.sendall(signed_DH_public_key)  # Send signed DH public key
+    conn.sendall(sender_DH_public_key_bytes)  # Send sender.py's public key
 
     # Reverting the public key from bytes back to an integer
     receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
@@ -95,9 +124,6 @@ shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret bac
 print("AES Key:", aes_key)
 
 # Encrypting the file with the AES key
-file_path = 'input.txt'
-encrypted_file_path = 'encrypted.txt'
-iv = b'IVkeyneedstobe16'  # Hardcoded IV key
 key = aes_key
 
 
@@ -147,14 +173,7 @@ server_socket.close()
 
 
 
-# # Generate RSA key pair
-# private_key_rsa = rsa.generate_private_key(
-#     public_exponent=65537,
-#     key_size=2048,
-#     backend=default_backend()
-# )
 
-# public_key_rsa = private_key_rsa.public_key()
 
 # # Sign the DH public key with RSA
 # rsa_private_key = private_key_rsa
