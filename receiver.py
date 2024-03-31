@@ -42,7 +42,7 @@ def recv_with_length_prefix(conn):
     # Read the length prefix (32-bit integer, 4 bytes)
     length_prefix = conn.recv(4)
     if not length_prefix:
-        raise ConnectionError("Connection closed by peer")
+        raise ConnectionError("\nConnection closed by peer")
     length = struct.unpack('!I', length_prefix)[0]
     
     # Read exactly 'length' bytes
@@ -50,7 +50,7 @@ def recv_with_length_prefix(conn):
     while len(data) < length:
         chunk = conn.recv(length - len(data))
         if not chunk:
-            raise ConnectionError("Connection closed by peer")
+            raise ConnectionError("\nConnection closed by peer")
         data += chunk
     return data
 
@@ -75,9 +75,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect((senderIP, serverPort))  # Try to connect to the server
             break  # If the connection is successful, break out of the loop
         except ConnectionRefusedError:
-            print("Connection failed. Trying again in 5 seconds...")
+            print("\nConnection failed. Trying again in 5 seconds...")
             time.sleep(5)  # Wait for 5 seconds before trying again
-    print(f"Successfully connected to {senderIP} on port {serverPort} \n")
+    print(f"\nSuccessfully connected to {senderIP} on port {serverPort} \n")
 
     # Send receiver.py's DH public key to sender.py, will be sent in bytes
     send_with_length_prefix(client_socket, receiver_DH_public_key_bytes)
@@ -108,16 +108,15 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             ),
             hashes.SHA256(),
         )
-        print("RSA Signature is valid.")
+        print("\nRSA Signature is valid.")
     except InvalidSignature:
-        print("RSA Signature is invalid.")
+        print("\nRSA Signature is invalid.")
 
     # Revert the public key from sender.py that is in bytes back to an integer
     sender_DH_public_key = int.from_bytes(sender_DH_public_key_bytes, 'big')
 
     # Compute shared secret key
     shared_secret = compute_shared_secret(sender_DH_public_key, receiver_DH_private_key, p)
-    print("Shared Secret from Receiver.py:", shared_secret)
 
     # Send the shared secret to sender.py
     send_with_length_prefix(client_socket, (shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big')))
@@ -128,9 +127,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Compare shared secrets to make sure they match and update shared_secrets_match
     if shared_secret == sender_shared_secret:
-        print("Shared secrets match")
+        print(f"\nShared secrets match: Sender.py secret_{sender_shared_secret} = Receiver.py secret_{shared_secret}")
     else:
-        print("Shared secrets do not match")
+        print(f"\nShared secrets do not match: Sender.py secret_{sender_shared_secret} != Receiver.py secret_{shared_secret}")
 
 # # Close the socket
 # client_socket.close()
@@ -156,25 +155,25 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect((senderIP, serverPort))  # Try to connect to the server
             break  # If the connection is successful, break out of the loop
         except ConnectionRefusedError:
-            print("Connection failed. Trying again in 5 seconds...")
+            print("\nConnection failed to receive encrypted message and IV from sender.py. Trying again in 5 seconds...")
             time.sleep(5)  # Wait for 5 seconds before trying again
-    print("Connection Succesful")
+    print("Receiving encrypted message and IV from sender.py...")
 
     # Receive data until there's no more to receive (for the file)
     time.sleep(3) # Wait for 3 seconds to ensure that the sender has sent the file
     
     encrypted_message = recv_with_length_prefix(client_socket)
-    print("Received Encrypted Message:")
+    print("\nReceived Encrypted Message:")
 
     # Receive the IV
     iv = client_socket.recv(16)
-    print(f"Received IV: {iv}")
+    print(f"\nReceived IV: {iv}")
 
     cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
     decryptor = cipher.decryptor()
     decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
 
-    print("Decrypted Message:", decrypted_message.decode())
+    print("\nDecrypted Message:", decrypted_message.decode())
 
     # Close the socket
     client_socket.close()

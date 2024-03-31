@@ -104,11 +104,11 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(('0.0.0.0', port))  # Listen on port 50101
 server_socket.listen()
 
-print("Server listening...")
+print("\nServer waiting for receiver.py to be available...")
 conn, addr = server_socket.accept()
 
 with conn:
-    print('Connected by', addr)
+    print('\nConnected by', addr)
 
     # Get receiver.py's DH public key
     receiver_DH_public_key = recv_with_length_prefix(conn)
@@ -127,7 +127,6 @@ with conn:
 
     #Compute the shared secret
     shared_secret = compute_shared_secret(receiver_DH_public_key, sender_DH_private_key, p)
-    print("Shared Secret from Sender.py:", shared_secret)
 
     # Send the shared secret to receiver.py
     send_with_length_prefix(conn, (shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big')))
@@ -139,14 +138,10 @@ with conn:
     # Compare shared secrets to make sure they match and update shared_secrets_match
     if shared_secret == receiver_shared_secret:
         shared_secrets_match = True
-        print("Shared secrets match")
+        print(f"\nShared secrets match: Sender.py secret_{shared_secret} = Receiver.py secret_{receiver_shared_secret}")
     else:
         shared_secrets_match = False
-        print("Shared secrets do not match")
-
-# # Close the socket
-# conn.close()
-# server_socket.close()
+        print(f"\nShared secrets do not match: Sender.py secret_{shared_secret} != Receiver.py secret_{receiver_shared_secret}")
 
 # Setup HKDF parameters for AES key derivation
 hkdf = HKDF(
@@ -196,22 +191,22 @@ try:
             with open(encrypted_file_path, 'rb') as file:
                 data = file.read()
                 send_with_length_prefix(conn,data)
-            print("Encrypted file sent")
+            print("\nEncrypted file sent")
 
             # Sending IV (assuming it's not too large)         
             conn.sendall(iv)
-            print("IV sent", iv)
+            print("\nIV sent", iv)
 
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"\nAn error occurred: {e}")
 
         finally:
             # Clean up
             if conn:
                 conn.close()
-                print("Connection closed")
+                print("\n Connection closed, Program finished.")
 except Exception as e:
-    print(f"An error occurred when accepting the connection: {e}")
+    print(f"\nAn error occurred when accepting the connection: {e}")
 finally:
     if server_socket:
         server_socket.close()
