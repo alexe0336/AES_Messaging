@@ -6,6 +6,7 @@ import time
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
     # Libraries for TCP socket API
 import socket
 
@@ -90,3 +91,24 @@ shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret bac
 
 # Print the AES key
 print("AES Key:", aes_key)
+
+#open socket to recieve message
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+    while True:
+        try:
+            client_socket.connect((senderIP, serverPort))  # Try to connect to the server
+            break  # If the connection is successful, break out of the loop
+        except ConnectionRefusedError:
+            print("Connection failed. Trying again in 5 seconds...")
+            time.sleep(5)  # Wait for 5 seconds before trying again
+    # Recieve the encrypted message from sender.py
+    encrypted_message = client_socket.recv(1024)
+    # Recieve the IV from sender.py
+    iv = client_socket.recv(1024)
+
+    # Decrypt the message
+    cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
+    decryptor = cipher.decryptor()
+    decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
+    print("Decrypted Message:", decrypted_message.decode())
+    

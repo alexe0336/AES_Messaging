@@ -109,7 +109,6 @@ def encrypt_file(file_path, encrypted_file_path, key, iv):
 
     with open(file_path, 'rb') as infile:
         with open(encrypted_file_path, 'wb') as outfile:
-            outfile.write(iv)  # It's common to prepend the IV to the encrypted file
 
             while True:
                 chunk = infile.read(1024 * 16)  # Read in chunks of 16 bytes
@@ -125,7 +124,25 @@ def encrypt_file(file_path, encrypted_file_path, key, iv):
 
 encrypt_file(file_path, encrypted_file_path, aes_key, iv)
 
+# Send encrypted file to receiver.py
+# Open socket to send encrypted file
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind(('0.0.0.0', 50101))  # Listen on port 50101
+server_socket.listen()
 
+print("Server listening...")
+conn, addr = server_socket.accept()
+
+with open(encrypted_file_path, 'rb') as file:
+    data = file.read()
+    conn.sendall(data)
+    print("Encrypted file sent")
+#send IV to receiver.py
+conn.sendall(iv)
+print("IV sent")
+
+#close socket
+server_socket.close()
 
 
 
