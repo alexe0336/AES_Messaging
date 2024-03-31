@@ -100,6 +100,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Convert the RSA public key from bytes back to an RSA public key object
     # Convert bytes back to an RSA public key object
+    print("Received PEM Data:", rsa_public_key_bytes.decode())
     rsa_public_key = load_pem_public_key(rsa_public_key_bytes, backend=default_backend())
     print("RSA Public Key:", rsa_public_key)
     # # Client verifies the signature
