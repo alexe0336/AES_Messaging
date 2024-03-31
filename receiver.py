@@ -67,21 +67,21 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     # Convert bytes back to an RSA public key object
     rsa_public_key = load_pem_public_key(rsa_public_key_bytes, backend=default_backend())
 
-    # Client verifies the signature
-    try:
-        # Verify the signature
-        rsa_public_key_bytes.verify(
-            sender_signed_DH_public_key,
-            sender_DH_public_key_bytes,  # The original message that was signed
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH,
-            ),
-            hashes.SHA256(),
-        )
-        print("Signature is valid.")
-    except InvalidSignature:
-        print("Signature is invalid.")
+    # # Client verifies the signature
+    # try:
+    #     # Verify the signature
+    #     rsa_public_key_bytes.verify(
+    #         sender_signed_DH_public_key,
+    #         sender_DH_public_key_bytes,  # The original message that was signed
+    #         padding.PSS(
+    #             mgf=padding.MGF1(hashes.SHA256()),
+    #             salt_length=padding.PSS.MAX_LENGTH,
+    #         ),
+    #         hashes.SHA256(),
+    #     )
+    #     print("Signature is valid.")
+    # except InvalidSignature:
+    #     print("Signature is invalid.")
 
     # Revert the public key from sender.py that is in bytes back to an integer
     sender_DH_public_key = int.from_bytes(sender_DH_public_key_bytes, 'big')
