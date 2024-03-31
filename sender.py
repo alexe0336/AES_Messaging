@@ -47,7 +47,7 @@ sender_DH_private_key = generate_private_key(p)
 sender_DH_public_key = generate_public_key(g, sender_DH_private_key, p)
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('0.0.0.0', 50100))  # Listen on port 50100
+server_socket.bind(('0.0.0.0', 50101))  # Listen on port 50101
 server_socket.listen()
 
 print("Server listening...")
