@@ -13,6 +13,7 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from cryptography.hazmat.backends import default_backend
 import struct
+from cryptography.hazmat.primitives import serialization
     # Libraries for TCP socket API
 import socket
 
@@ -97,11 +98,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     rsa_public_key_bytes = recv_with_length_prefix(client_socket)
     print("test4")
 
-
     # Convert the RSA public key from bytes back to an RSA public key object
     # Convert bytes back to an RSA public key object
     print("Received PEM Data:", rsa_public_key_bytes.decode())
-    rsa_public_key = load_pem_public_key(rsa_public_key_bytes, backend=default_backend())
+    rsa_public_key = serialization.load_pem_public_key(
+    rsa_public_key_bytes,
+    backend=default_backend()
+)
     print("RSA Public Key:", rsa_public_key)
     # # Client verifies the signature
     # try:

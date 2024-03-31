@@ -39,7 +39,7 @@ def generate_public_key(g, private_key, p):
 # Function to compute shared secret key, requires other party's public key
 def compute_shared_secret(other_public_key, private_key, p):
     # shared_secret = other_public_key^private_key mod p
-    return pow(other_public_key, private_key, p)
+    return int(pow(other_public_key, private_key, p))
 
 # Function that sets the receive length of the data incoming
 def send_with_length_prefix(client_socket, data):
