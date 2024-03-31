@@ -18,6 +18,7 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 p = 23
 g = 5
 
+shared_secrets_match = False
 # Function to generate Diffie-Hellman private key
 def generate_private_key(p):
     from random import randint
@@ -64,10 +65,21 @@ receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
 
 #Compute the shared secret
 shared_secret = compute_shared_secret(receiver_DH_public_key, sender_DH_private_key, p)
-print("Shared Secret:", shared_secret)
+print("Shared Secret Sender.py:", shared_secret)
 
 # Send the shared secret to reciever.py
+conn.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
 
+# Recieve the shared secret from reciever.py and turn it back into an integer
+receiver_shared_secret = int.from_bytes(conn.recv(1024), 'big')
+
+# Compare shared secrets to make sure they match and update shared_secrets_match
+if shared_secret == receiver_shared_secret:
+    shared_secrets_match = True
+    print("Shared secrets match")
+else:
+    shared_secrets_match = False
+    print("Shared secrets do not match")
 
 # # Generate RSA key pair
 # private_key_rsa = rsa.generate_private_key(
