@@ -83,7 +83,7 @@ with conn:
     print('Connected by', addr)
     receiver_DH_public_key = conn.recv(1024)  # Get receiver.py's public key
     conn.sendall(public_key_rsa_bytes)  # Send the RSA Public key
-    conn.sendall(signed_DH_public_key_bytes)  # Send signed DH public key
+    conn.sendall(signed_DH_public_key_bytes)  # Send RSA signed DH public key
     conn.sendall(sender_DH_public_key_bytes)  # Send sender.py's DH public key
 
     # Reverting the public key from bytes back to an integer

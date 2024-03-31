@@ -62,9 +62,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     print("test1")
     sender_signed_DH_public_key = client_socket.recv(1024)  # Receive sender.py's RSA public key
     print("test2")
-    rsa_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's signed DH public key
+    rsa_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's RSA signed DH public key
     print("test3")
-    sender_DH_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's DH public key
+    sender_DH_public_key_bytes = client_socket.recv(4096)  # Receive sender.py's DH public key
     print("test4")
 
     # Convert the RSA public key from bytes back to an RSA public key object
