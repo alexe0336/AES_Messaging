@@ -167,9 +167,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         except ConnectionRefusedError:
             print("Connection failed. Trying again in 5 seconds...")
             time.sleep(5)  # Wait for 5 seconds before trying again
-    # Recieve the encrypted message from sender.py
+    # Receive the encrypted message from sender.py
     encrypted_message = client_socket.recv(1024)
-    # Recieve the IV from sender.py
+    # Receive the IV from sender.py
     iv = client_socket.recv(1024)
 
     # Decrypt the message
