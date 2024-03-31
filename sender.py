@@ -194,8 +194,8 @@ try:
         try:
             # Sending the encrypted file in chunks
             with open(encrypted_file_path, 'rb') as file:
-                while chunk := file.read(4096):  # Reading in chunks of 4 KB
-                    conn.sendall(chunk)
+                data = file.read
+                send_with_length_prefix(conn,data)
             print("Encrypted file sent")
 
             # Sending IV (assuming it's not too large)

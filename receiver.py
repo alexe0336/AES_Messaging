@@ -172,13 +172,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Receive data until there's no more to receive (for the file)
     time.sleep(3) # Wait for 3 seconds to ensure that the sender has sent the file
-    chunks = []
-    while True:
-        chunk = client_socket.recv(4096)  # Adjust buffer size as necessary
-        if not chunk:
-            break  # No more data to receive
-        chunks.append(chunk)
-    encrypted_message = b''.join(chunks)
+    
+    encrypted_message = recv_with_length_prefix(client_socket)
     print("Received Encrypted Message:", encrypted_message)
 
     # Receive the IV
