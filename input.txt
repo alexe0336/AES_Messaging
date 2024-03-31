@@ -1,2 +1,2 @@
-Hey this is a test message from sender.py. 
+This is very secret my password is 1234567890
 -Alex
