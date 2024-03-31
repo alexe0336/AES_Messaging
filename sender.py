@@ -140,6 +140,10 @@ with conn:
         shared_secrets_match = False
         print("Shared secrets do not match")
 
+# Close the socket
+conn.close()
+server_socket.close()
+
 # Setup HKDF parameters for AES key derivation
 hkdf = HKDF(
     algorithm=hashes.SHA256(),
@@ -202,6 +206,7 @@ conn.sendall(iv)
 print("IV sent")
 
 #close socket
+conn.close()
 server_socket.close()
 
 

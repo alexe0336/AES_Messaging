@@ -138,6 +138,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         shared_secrets_match = False
         print("Shared secrets do not match")
 
+# Close the socket
+client_socket.close()
+
 # Setup HKDF parameters for AES key derivation
 hkdf = HKDF(
     algorithm=hashes.SHA256(),
@@ -174,3 +177,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     decryptor = cipher.decryptor()
     decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
     print("Decrypted Message:", decrypted_message.decode())
+
+# Close the socket
+client_socket.close()
