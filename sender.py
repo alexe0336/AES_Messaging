@@ -190,24 +190,28 @@ encrypt_file(file_path, encrypted_file_path, aes_key, iv)
 
 # Open socket to send encrypted file
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('0.0.0.0', 50101))  # Listen on port 50101
+server_socket.bind(('0.0.0.0', 50101))
 server_socket.listen()
-
 print("Server listening...")
+
 conn, addr = server_socket.accept()
 
 try:
-    # Send the encrypted file to receiver.py
+    # Sending the encrypted file in chunks
     with open(encrypted_file_path, 'rb') as file:
-        data = file.read()
-        conn.sendall(data)
+        while chunk := file.read(4096):  # Reading in chunks of 4 KB
+            conn.sendall(chunk)
     print("Encrypted file sent")
 
-    # Send IV to receiver.py
+    # Sending IV (assuming it's not too large)
     conn.sendall(iv)
     print("IV sent")
+
+except Exception as e:
+    print(f"An error occurred: {e}")
+
 finally:
-    # Closing the connection
+    # Clean up
     conn.close()
     server_socket.close()
     print("Connection closed")
