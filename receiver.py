@@ -3,6 +3,7 @@
 #import the necessary libraries
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import dh
+import time
     # Libraries for TCP socket API
 import socket
 from cryptography.hazmat.primitives import serialization
@@ -39,12 +40,22 @@ receiver_DH_public_key = generate_public_key(g, receiver_DH_private_key, p)
 #     format=serialization.PublicFormat.SubjectPublicKeyInfo
 # )
 
+#Public key must be converted to bytes before it can be sent
+receiver_DH_public_key_bytes = receiver_DH_public_key.to_bytes((receiver_DH_public_key.bit_length() + 7) // 8, 'big')
+
 senderIP = '127.0.0.1' # Set this to the IP of the computer running the sender.py code
 serverPort = 50101 # Set this to the port number the sender.py code is listening on
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-    client_socket.connect((senderIP, serverPort))  # Use the server's address
-    client_socket.sendall(receiver_DH_public_key)  # Send the receiver.py's public key
+    while True:
+        try:
+            client_socket.connect((senderIP, serverPort))  # Try to connect to the server
+            break  # If the connection is successful, break out of the loop
+        except ConnectionRefusedError:
+            print("Connection failed. Trying again in 5 seconds...")
+            time.sleep(5)  # Wait for 5 seconds before trying again
+
+    client_socket.sendall(receiver_DH_public_key_bytes)  # Send the receiver.py's public key
     sender_DH_public_key = client_socket.recv(1024)  # Receive sender.py's public key
 
 # Compute shared secret key
