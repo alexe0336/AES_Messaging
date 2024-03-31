@@ -80,22 +80,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         except ConnectionRefusedError:
             print("Connection failed. Trying again in 5 seconds...")
             time.sleep(5)  # Wait for 5 seconds before trying again
-    print("Connection Succesful")
-
+    print(f"Successfully connected to {senderIP} on port {serverPort} \n")
 
     # Send receiver.py's DH public key to sender.py, will be sent in bytes
     send_with_length_prefix(client_socket, receiver_DH_public_key_bytes)
-    print("Sent Receiver.py's Public Key:", receiver_DH_public_key_bytes)
 
     # Receive sender.py's RSA public key
     rsa_public_key_bytes = recv_with_length_prefix(client_socket)
-    print("received RSA public key")
+
     # Receive sender.py's DH public key
     sender_DH_public_key_bytes = recv_with_length_prefix(client_socket)
-    print("Received Sender.py's Public Key:")
+
     # Receive sender.py's RSA signed DH public key
     sender_signed_DH_public_key = recv_with_length_prefix(client_socket)
-    print("Received Sender.py's Signed Public Key:")
 
     # Convert the RSA public key from bytes back to an RSA public key object
     rsa_public_key = serialization.load_pem_public_key(
@@ -114,9 +111,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             ),
             hashes.SHA256(),
         )
-        print("Signature is valid.")
+        print("RSA Signature is valid.")
     except InvalidSignature:
-        print("Signature is invalid.")
+        print("RSA Signature is invalid.")
 
     # Revert the public key from sender.py that is in bytes back to an integer
     sender_DH_public_key = int.from_bytes(sender_DH_public_key_bytes, 'big')
@@ -157,9 +154,6 @@ shared_secret = shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'b
 aes_key = hkdf.derive(shared_secret)
 shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret back to an integer
 
-# Print the AES key
-print("AES Key:", aes_key)
-
 # Reopen socket here
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     while True:
@@ -175,7 +169,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     time.sleep(3) # Wait for 3 seconds to ensure that the sender has sent the file
     
     encrypted_message = recv_with_length_prefix(client_socket)
-    print("Received Encrypted Message:", encrypted_message)
+    print("Received Encrypted Message:")
 
     # Receive the IV
     iv = client_socket.recv(16)

@@ -107,17 +107,15 @@ with conn:
 
     # Get receiver.py's DH public key
     receiver_DH_public_key = recv_with_length_prefix(conn)
-    print("Received Receiver.py's Public Key:")
 
     # Send the RSA Public key
     send_with_length_prefix(conn, public_key_rsa_bytes)
-    print("Sent RSA Public Key:")
+
     # Send sender.py's DH public key
     send_with_length_prefix(conn, sender_DH_public_key_bytes)
-    print("Sent Sender.py's Public Key:")
+
     # Send RSA signed DH public key
     send_with_length_prefix(conn, signed_DH_public_key_bytes)
-    print("Sent Signed Public Key:")
 
     # Reverting the public key from bytes back to an integer
     receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
@@ -159,12 +157,8 @@ shared_secret = shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'b
 aes_key = hkdf.derive(shared_secret)
 shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret back to an integer
 
-# Print the AES key
-print("AES Key:", aes_key)
-
 # Encrypting the file with the AES key
 key = aes_key
-
 
 # #Create a function to encrypt the file
 def encrypt_file(file_path, encrypted_file_path, key, iv):
@@ -199,8 +193,7 @@ try:
                 send_with_length_prefix(conn,data)
             print("Encrypted file sent")
 
-            # Sending IV (assuming it's not too large)
-            print(f"Sending IV: {iv}")            
+            # Sending IV (assuming it's not too large)         
             conn.sendall(iv)
             print("IV sent", iv)
 
