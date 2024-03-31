@@ -157,7 +157,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         except ConnectionRefusedError:
             print("\nConnection failed to receive encrypted message and IV from sender.py. Trying again in 5 seconds...")
             time.sleep(5)  # Wait for 5 seconds before trying again
-    print("Receiving encrypted message and IV from sender.py...")
+    print("\nReceiving encrypted message and IV from sender.py...")
 
     # Receive data until there's no more to receive (for the file)
     time.sleep(3) # Wait for 3 seconds to ensure that the sender has sent the file
