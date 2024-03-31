@@ -77,7 +77,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         except ConnectionRefusedError:
             print("\nConnection failed. Trying again in 5 seconds...")
             time.sleep(5)  # Wait for 5 seconds before trying again
-    print(f"\nSuccessfully connected to {senderIP} on port {serverPort} \n")
+    print(f"\nSuccessfully connected to {senderIP} on port {serverPort}")
 
     # Send receiver.py's DH public key to sender.py, will be sent in bytes
     send_with_length_prefix(client_socket, receiver_DH_public_key_bytes)
