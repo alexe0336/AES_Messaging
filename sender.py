@@ -84,8 +84,10 @@ public_key_rsa_bytes = public_key_rsa.public_bytes(
 
 # Generate Diffie-Hellman private key
 sender_DH_private_key = generate_private_key(p)
+
 # Generate Diffie-Hellman public key
 sender_DH_public_key = generate_public_key(g, sender_DH_private_key, p)
+
 # Public key must be converted to bytes before it can be sent
 sender_DH_public_key_bytes = sender_DH_public_key.to_bytes((sender_DH_public_key.bit_length() + 7) // 8, 'big')
 
