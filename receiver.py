@@ -2,11 +2,12 @@
 
 #import the necessary libraries
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import dh
 import time
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
     # Libraries for TCP socket API
 import socket
-from cryptography.hazmat.primitives import serialization
 
 # Global Variables
 p = 23
@@ -73,3 +74,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         shared_secrets_match = False
         print("Shared secrets do not match")
 
+# Setup HKDF parameters for AES key derivation
+hkdf = HKDF(
+    algorithm=hashes.SHA256(),
+    length=32,
+    salt=b'bytes', # Will convert 'bytes' ASCII characters into a byte value
+    info=b'bytes', # Will convert 'bytes' ASCII characters into a byte value
+    backend=default_backend()
+)
+
+# Generate the AES key, shared secret needs to be converted to bytes before it can be used
+shared_secret = shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big') # Convert shared secret to bytes
+aes_key = hkdf.derive(shared_secret)
+shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret back to an integer
+
+# Print the AES key
+print("AES Key:", aes_key)

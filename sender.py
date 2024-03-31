@@ -128,6 +128,8 @@ encrypt_file(file_path, encrypted_file_path, aes_key, iv)
 
 
 
+
+
 # # Generate RSA key pair
 # private_key_rsa = rsa.generate_private_key(
 #     public_exponent=65537,
