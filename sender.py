@@ -5,9 +5,6 @@
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import serialization
 
     # Libraries for TCP socket API
@@ -87,7 +84,7 @@ with conn:
     receiver_DH_public_key = conn.recv(1024)  # Get receiver.py's public key
     conn.sendall(public_key_rsa_bytes)  # Send the RSA Public key
     conn.sendall(signed_DH_public_key_bytes)  # Send signed DH public key
-    conn.sendall(sender_DH_public_key_bytes)  # Send sender.py's public key
+    conn.sendall(sender_DH_public_key_bytes)  # Send sender.py's DH public key
 
     # Reverting the public key from bytes back to an integer
     receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
