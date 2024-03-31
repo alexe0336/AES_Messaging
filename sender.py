@@ -52,7 +52,7 @@ private_key_rsa = rsa.generate_private_key(
 
 public_key_rsa = private_key_rsa.public_key()
 #convert the RSA public key to bytes so it can be sent
-public_key_rsa_bytes = public_key_rsa.public_bytes
+public_key_rsa_bytes = public_key_rsa.public_bytes.to_bytes((public_key_rsa.public_bytes.bit_length() + 7) // 8, 'big')
 
 # Generate Diffie-Hellman private key
 sender_DH_private_key = generate_private_key(p)
