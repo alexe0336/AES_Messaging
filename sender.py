@@ -78,6 +78,8 @@ public_key_rsa_bytes = public_key_rsa.public_bytes(
     format=serialization.PublicFormat.SubjectPublicKeyInfo
 )
 
+print("RSA Public Key:", public_key_rsa_bytes)
+
 # Generate Diffie-Hellman private key
 sender_DH_private_key = generate_private_key(p)
 # Generate Diffie-Hellman public key
