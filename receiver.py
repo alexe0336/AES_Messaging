@@ -159,25 +159,36 @@ shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret bac
 # Print the AES key
 print("AES Key:", aes_key)
 
-# Receive data until there's no more to receive (for the file)
-time.sleep(3) # Wait for 3 seconds to ensure that the sender has sent the file
-chunks = []
-while True:
-    chunk = client_socket.recv(4096)  # Adjust buffer size as necessary
-    if not chunk:
-        break  # No more data to receive
-    chunks.append(chunk)
-encrypted_message = b''.join(chunks)
+# Reopen socket here
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+    while True:
+        try:
+            client_socket.connect((senderIP, serverPort))  # Try to connect to the server
+            break  # If the connection is successful, break out of the loop
+        except ConnectionRefusedError:
+            print("Connection failed. Trying again in 5 seconds...")
+            time.sleep(5)  # Wait for 5 seconds before trying again
+    print("Connection Succesful")
 
-# Receive the IV
-iv = client_socket.recv(4096)
-print("Received IV:", iv)
+    # Receive data until there's no more to receive (for the file)
+    time.sleep(3) # Wait for 3 seconds to ensure that the sender has sent the file
+    chunks = []
+    while True:
+        chunk = client_socket.recv(4096)  # Adjust buffer size as necessary
+        if not chunk:
+            break  # No more data to receive
+        chunks.append(chunk)
+    encrypted_message = b''.join(chunks)
 
-cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
-decryptor = cipher.decryptor()
-decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
+    # Receive the IV
+    iv = client_socket.recv(4096)
+    print("Received IV:", iv)
 
-print("Decrypted Message:", decrypted_message.decode())
+    cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
+    decryptor = cipher.decryptor()
+    decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
 
-# Close the socket
-client_socket.close()
+    print("Decrypted Message:", decrypted_message.decode())
+
+    # Close the socket
+    client_socket.close()
