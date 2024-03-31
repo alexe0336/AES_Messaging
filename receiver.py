@@ -52,6 +52,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     while True:
         try:
             client_socket.connect((senderIP, serverPort))  # Try to connect to the server
+            print("Connection successful.")
             break  # If the connection is successful, break out of the loop
         except ConnectionRefusedError:
             print("Connection failed. Trying again in 5 seconds...")
