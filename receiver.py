@@ -180,3 +180,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     decryptor = cipher.decryptor()
     decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
     print("Decrypted Message:", decrypted_message.decode())
+
+# #  File "/Users/alexespinoza/Github Repo/AES_Messaging-2/receiver.py", line 104, in <module>
+#     rsa_public_key = serialization.load_pem_public_key(
+#                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ValueError: Unable to load PEM file. See https://cryptography.io/en/latest/faq/#why-can-t-i-import-my-pem-file for more details. MalformedFraming
