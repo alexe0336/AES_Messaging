@@ -90,8 +90,10 @@ hkdf = HKDF(
     backend=default_backend()
 )
 
-# Generate the AES key
+# Generate the AES key, shared secret needs to be converted to bytes before it can be used
+shared_secret = shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big') # Convert shared secret to bytes
 aes_key = hkdf.derive(shared_secret)
+shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret back to an integer
 
 # Print the AES key
 print("AES Key:", aes_key)
