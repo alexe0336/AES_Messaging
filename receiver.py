@@ -21,7 +21,7 @@ p = 23
 g = 5
 
 shared_secrets_match = False
-
+# 10.0.0.92 is my PC, 10.0.0.97 is my Mac
 senderIP = '10.0.0.97' # Set this to the IP of the computer running the sender.py code
 serverPort = 50101 # Set this to the port number the sender.py code is listening on
 
