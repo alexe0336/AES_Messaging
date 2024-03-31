@@ -1,8 +1,10 @@
-#Establish a shared secret with Diffie-Hellman key exchange
+# Receiver.py, Used to decrypt the encrypted message.
 
 #import the necessary libraries
 import time
 import struct
+import socket
+
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
@@ -12,15 +14,10 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.exceptions import InvalidSignature
 
 
-    # Libraries for TCP socket API
-import socket
-
 # Global Variables
-p = 23
-g = 5
+p = 23 # Prime number, you can change just make sure you also change it in sender.py
+g = 5 # Generator, you can change just make sure you also change it in sender.py
 
-shared_secrets_match = False
-# 10.0.0.92 is my PC, 10.0.0.97 is my Mac
 senderIP = '10.0.0.92' # Set this to the IP of the computer running the sender.py code
 serverPort = 50101 # Set this to the port number the sender.py code is listening on
 
@@ -131,10 +128,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Compare shared secrets to make sure they match and update shared_secrets_match
     if shared_secret == sender_shared_secret:
-        shared_secrets_match = True
         print("Shared secrets match")
     else:
-        shared_secrets_match = False
         print("Shared secrets do not match")
 
 # # Close the socket

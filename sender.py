@@ -13,14 +13,20 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 # Global variables
-p = 23
-g = 5
+p = 23 # Prime number, you can change just make sure you also change it in receiver.py
+g = 5 # Generator, you can change just make sure you also change it in receiver.py
 
 shared_secrets_match = False
 
-file_path = 'input.txt'
-encrypted_file_path = 'encrypted.txt'
-iv = b'IVkeyneedstobe16'  # Hardcoded IV key
+file_path = 'input.txt' # Name and path of file to be encrypted
+encrypted_file_path = 'encrypted.txt' # Name and path of where it will save file after encryption
+iv = b'IVkeyneedstobe16'  # Hardcoded IV key, must be 16 bytes
+
+port = 50101 # Change port number to whatever you want, just make sure it matches the receiver.py port number
+
+#Introduction print statement
+print("You are currently running the sender.py file. This file sends the encrypted file to the receiver.py file.")
+print("")
 
 # Function to generate Diffie-Hellman private key
 def generate_private_key(p):
@@ -96,7 +102,7 @@ signed_DH_public_key_bytes = private_key_rsa.sign(
 
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('0.0.0.0', 50101))  # Listen on port 50101
+server_socket.bind(('0.0.0.0', port))  # Listen on port 50101
 server_socket.listen()
 
 print("Server listening...")
