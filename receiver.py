@@ -59,8 +59,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     print("Connection Succesful")
 
     client_socket.sendall(receiver_DH_public_key_bytes)  # Send the receiver.py's public key
+    print("test1")
     sender_signed_DH_public_key = client_socket.recv(1024)  # Receive sender.py's RSA public key
+    print("test2")
     rsa_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's signed DH public key
+    print("Received sender.py's RSA public key:", rsa_public_key_bytes)
     sender_DH_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's DH public key
     print("Received sender.py's public key:", sender_DH_public_key_bytes)
 
