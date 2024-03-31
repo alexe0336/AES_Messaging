@@ -62,11 +62,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     sender_signed_DH_public_key = client_socket.recv(1024)  # Receive sender.py's RSA public key
     rsa_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's signed DH public key
     sender_DH_public_key_bytes = client_socket.recv(1024)  # Receive sender.py's DH public key
+    print("Received sender.py's public key:", sender_DH_public_key_bytes)
 
     # Convert the RSA public key from bytes back to an RSA public key object
     # Convert bytes back to an RSA public key object
     rsa_public_key = load_pem_public_key(rsa_public_key_bytes, backend=default_backend())
-
+    print("RSA Public Key:", rsa_public_key)
     # # Client verifies the signature
     # try:
     #     # Verify the signature
@@ -85,6 +86,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Revert the public key from sender.py that is in bytes back to an integer
     sender_DH_public_key = int.from_bytes(sender_DH_public_key_bytes, 'big')
+    print("Sender.py's Public Key:", sender_DH_public_key)
 
     # Compute shared secret key
     shared_secret = compute_shared_secret(sender_DH_public_key, receiver_DH_private_key, p)

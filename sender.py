@@ -66,7 +66,7 @@ sender_DH_public_key = generate_public_key(g, sender_DH_private_key, p)
 sender_DH_public_key_bytes = sender_DH_public_key.to_bytes((sender_DH_public_key.bit_length() + 7) // 8, 'big')
 
 #sender.py RSA signs the DH public key
-signed_DH_public_key = private_key_rsa.sign(
+signed_DH_public_key_bytes = private_key_rsa.sign(
     sender_DH_public_key_bytes,
     padding.PSS(
         mgf=padding.MGF1(hashes.SHA256()),
@@ -86,7 +86,7 @@ with conn:
     print('Connected by', addr)
     receiver_DH_public_key = conn.recv(1024)  # Get receiver.py's public key
     conn.sendall(public_key_rsa_bytes)  # Send the RSA Public key
-    conn.sendall(signed_DH_public_key)  # Send signed DH public key
+    conn.sendall(signed_DH_public_key_bytes)  # Send signed DH public key
     conn.sendall(sender_DH_public_key_bytes)  # Send sender.py's public key
 
     # Reverting the public key from bytes back to an integer
