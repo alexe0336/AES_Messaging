@@ -126,11 +126,12 @@ with conn:
     shared_secret = compute_shared_secret(receiver_DH_public_key, sender_DH_private_key, p)
     print("Shared Secret from Sender.py:", shared_secret)
 
-    # Send the shared secret to reciever.py
+    # Send the shared secret to receiver.py
     send_with_length_prefix(conn, (shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big')))
 
-    # Recieve the shared secret from reciever.py and turn it back into an integer
-    receiver_shared_secret = recv_with_length_prefix(int.from_bytes(conn.recv(1024), 'big'))
+    # Receive the shared secret from receiver.py and turn it back into an integer
+    receiver_shared_secret = recv_with_length_prefix(conn)
+    receiver_shared_secret = int.from_bytes(receiver_shared_secret, 'big')
 
     # Compare shared secrets to make sure they match and update shared_secrets_match
     if shared_secret == receiver_shared_secret:
