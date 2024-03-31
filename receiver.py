@@ -1,19 +1,16 @@
 #Establish a shared secret with Diffie-Hellman key exchange
 
 #import the necessary libraries
-from cryptography.hazmat.backends import default_backend
 import time
+import struct
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.exceptions import InvalidSignature
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives.serialization import load_pem_public_key
-from cryptography.hazmat.backends import default_backend
-import struct
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.exceptions import InvalidSignature
+
     # Libraries for TCP socket API
 import socket
 
@@ -91,44 +88,41 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
 
     # Receive sender.py's RSA public key
     rsa_public_key_bytes = recv_with_length_prefix(client_socket)
-    print("received RSA public key", rsa_public_key_bytes)
+    print("received RSA public key")
     # Receive sender.py's DH public key
     sender_DH_public_key_bytes = recv_with_length_prefix(client_socket)
-    print("Received Sender.py's Public Key:", sender_DH_public_key_bytes)
+    print("Received Sender.py's Public Key:")
     # Receive sender.py's RSA signed DH public key
     sender_signed_DH_public_key = recv_with_length_prefix(client_socket)
-    print("Received Sender.py's Signed Public Key:", sender_signed_DH_public_key)
+    print("Received Sender.py's Signed Public Key:")
 
     # Convert the RSA public key from bytes back to an RSA public key object
-    # Convert bytes back to an RSA public key object
     rsa_public_key = serialization.load_pem_public_key(
     rsa_public_key_bytes,
     backend=default_backend()
 )
-    print("RSA Public Key:", rsa_public_key)
-    # # Client verifies the signature
-    # try:
-    #     # Verify the signature
-    #     rsa_public_key_bytes.verify(
-    #         sender_signed_DH_public_key,
-    #         sender_DH_public_key_bytes,  # The original message that was signed
-    #         padding.PSS(
-    #             mgf=padding.MGF1(hashes.SHA256()),
-    #             salt_length=padding.PSS.MAX_LENGTH,
-    #         ),
-    #         hashes.SHA256(),
-    #     )
-    #     print("Signature is valid.")
-    # except InvalidSignature:
-    #     print("Signature is invalid.")
+    # Client verifies the signature
+    try:
+        # Verify the signature
+        rsa_public_key_bytes.verify(
+            sender_signed_DH_public_key,
+            sender_DH_public_key_bytes,  # The original message that was signed
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH,
+            ),
+            hashes.SHA256(),
+        )
+        print("Signature is valid.")
+    except InvalidSignature:
+        print("Signature is invalid.")
 
     # Revert the public key from sender.py that is in bytes back to an integer
     sender_DH_public_key = int.from_bytes(sender_DH_public_key_bytes, 'big')
-    print("Sender.py's Public Key:", sender_DH_public_key)
 
     # Compute shared secret key
     shared_secret = compute_shared_secret(sender_DH_public_key, receiver_DH_private_key, p)
-    print("Shared Secret Receiver.py:", shared_secret)
+    print("Shared Secret from Receiver.py:", shared_secret)
 
     # Send the shared secret to sender.py
     client_socket.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
@@ -180,8 +174,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     decryptor = cipher.decryptor()
     decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
     print("Decrypted Message:", decrypted_message.decode())
-
-# #  File "/Users/alexespinoza/Github Repo/AES_Messaging-2/receiver.py", line 104, in <module>
-#     rsa_public_key = serialization.load_pem_public_key(
-#                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# ValueError: Unable to load PEM file. See https://cryptography.io/en/latest/faq/#why-can-t-i-import-my-pem-file for more details. MalformedFraming

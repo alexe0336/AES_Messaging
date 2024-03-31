@@ -2,17 +2,14 @@
 # Alex Espinoza
 
 #import the necessary libraries
+import struct
+import socket
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import serialization
-import struct
-    # Libraries for TCP socket API
-import socket
 from cryptography.hazmat.primitives import hashes
-    # RSA library
 from cryptography.hazmat.primitives.asymmetric import rsa
-    # HKDF library
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 # Global variables
@@ -71,16 +68,14 @@ private_key_rsa = rsa.generate_private_key(
     backend=default_backend()
 )
 
-public_key_rsa = private_key_rsa.public_key()
+#Create the RSA public key
+public_key_rsa = private_key_rsa.public_key() 
+
 #convert the RSA public key to bytes so it can be sent
 public_key_rsa_bytes = public_key_rsa.public_bytes(
     encoding=serialization.Encoding.PEM,
     format=serialization.PublicFormat.SubjectPublicKeyInfo
 )
-# #convert to base64 so it can be sent
-# public_key_rsa_bytes_b64 = base64.b64encode(public_key_rsa_bytes)
-
-print("RSA Public Key:", public_key_rsa_bytes)
 
 # Generate Diffie-Hellman private key
 sender_DH_private_key = generate_private_key(p)
@@ -112,28 +107,30 @@ with conn:
 
     # Get receiver.py's DH public key
     receiver_DH_public_key = recv_with_length_prefix(conn)
+    print("Received Receiver.py's Public Key:")
 
     # Send the RSA Public key
     send_with_length_prefix(conn, public_key_rsa_bytes)
+    print("Sent RSA Public Key:")
     # Send sender.py's DH public key
     send_with_length_prefix(conn, sender_DH_public_key_bytes)
+    print("Sent Sender.py's Public Key:")
     # Send RSA signed DH public key
     send_with_length_prefix(conn, signed_DH_public_key_bytes)
+    print("Sent Signed Public Key:")
 
     # Reverting the public key from bytes back to an integer
     receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
 
     #Compute the shared secret
     shared_secret = compute_shared_secret(receiver_DH_public_key, sender_DH_private_key, p)
-    print("Shared Secret Sender.py:", shared_secret)
+    print("Shared Secret from Sender.py:", shared_secret)
 
     # Send the shared secret to reciever.py
-    shared_secret_bytes = shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big')
-    conn.sendall(shared_secret_bytes)
+    conn.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
 
     # Recieve the shared secret from reciever.py and turn it back into an integer
-    receiver_shared_secret = conn.recv(32)
-    receiver_shared_secret = int.from_bytes(receiver_shared_secret, 'big')
+    receiver_shared_secret = int.from_bytes(conn.recv(1024), 'big')
 
     # Compare shared secrets to make sure they match and update shared_secrets_match
     if shared_secret == receiver_shared_secret:
