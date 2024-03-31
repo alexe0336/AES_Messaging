@@ -52,11 +52,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     while True:
         try:
             client_socket.connect((senderIP, serverPort))  # Try to connect to the server
-            print("Connection successful.")
             break  # If the connection is successful, break out of the loop
         except ConnectionRefusedError:
             print("Connection failed. Trying again in 5 seconds...")
             time.sleep(5)  # Wait for 5 seconds before trying again
+    print("Connection Succesful")
 
     client_socket.sendall(receiver_DH_public_key_bytes)  # Send the receiver.py's public key
     sender_signed_DH_public_key = client_socket.recv(1024)  # Receive sender.py's RSA public key
