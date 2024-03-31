@@ -199,8 +199,6 @@ try:
             print("Encrypted file sent")
 
             # Sending IV (assuming it's not too large)
-            #convert iv to bytes
-            iv = iv.to_bytes((iv.bit_length() + 7) // 8, 'big')
             conn.sendall(iv)
             print("IV sent", iv)
 
