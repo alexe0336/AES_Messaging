@@ -159,24 +159,32 @@ shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret bac
 print("AES Key:", aes_key)
 
 #open socket to recieve message
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-    while True:
-        try:
-            client_socket.connect((senderIP, serverPort))  # Try to connect to the server
-            break  # If the connection is successful, break out of the loop
-        except ConnectionRefusedError:
-            print("Connection failed. Trying again in 5 seconds...")
-            time.sleep(5)  # Wait for 5 seconds before trying again
-    # Receive the encrypted message from sender.py
-    encrypted_message = client_socket.recv(1024)
-    # Receive the IV from sender.py
-    iv = client_socket.recv(1024)
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+while True:
+    try:
+        client_socket.connect((senderIP, serverPort))  # Try to connect to the server
+        break  # If the connection is successful, break out of the loop
+    except ConnectionRefusedError:
+        print("Connection failed. Trying again in 5 seconds...")
+        time.sleep(5)  # Wait for 5 seconds before trying again
+# Receive data until there's no more to receive (for the file)
+chunks = []
+while True:
+    chunk = client_socket.recv(4096)  # Adjust buffer size as necessary
+    if not chunk:
+        break  # No more data to receive
+    chunks.append(chunk)
+encrypted_message = b''.join(chunks)
 
-    # Decrypt the message
-    cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
-    decryptor = cipher.decryptor()
-    decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
-    print("Decrypted Message:", decrypted_message.decode())
+# Assuming IV is sent after the file and is of a known size
+iv_size = 16  # For AES, typically 16 bytes
+iv = client_socket.recv(iv_size)
+
+cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
+decryptor = cipher.decryptor()
+decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
+
+print("Decrypted Message:", decrypted_message.decode())
 
 # Close the socket
 client_socket.close()
