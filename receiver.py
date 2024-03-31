@@ -59,24 +59,24 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     client_socket.sendall(receiver_DH_public_key_bytes)  # Send the receiver.py's public key
     sender_DH_public_key = client_socket.recv(1024)  # Receive sender.py's public key
 
-# Revert the public key from sender.py that is in bytes back to an integer
-sender_DH_public_key = int.from_bytes(sender_DH_public_key, 'big')
+    # Revert the public key from sender.py that is in bytes back to an integer
+    sender_DH_public_key = int.from_bytes(sender_DH_public_key, 'big')
 
-# Compute shared secret key
-shared_secret = compute_shared_secret(sender_DH_public_key, receiver_DH_private_key, p)
-print("Shared Secret Receiver.py:", shared_secret)
+    # Compute shared secret key
+    shared_secret = compute_shared_secret(sender_DH_public_key, receiver_DH_private_key, p)
+    print("Shared Secret Receiver.py:", shared_secret)
 
-# Send the shared secret to sender.py
-client_socket.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
+    # Send the shared secret to sender.py
+    client_socket.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
 
-# Recieve the shared secret from reciever.py and turn it back into an integer
-sender_shared_secret = int.from_bytes(client_socket.recv(1024), 'big')
+    # Recieve the shared secret from reciever.py and turn it back into an integer
+    sender_shared_secret = int.from_bytes(client_socket.recv(1024), 'big')
 
-# Compare shared secrets to make sure they match and update shared_secrets_match
-if shared_secret == sender_shared_secret:
-    shared_secrets_match = True
-    print("Shared secrets match")
-else:
-    shared_secrets_match = False
-    print("Shared secrets do not match")
+    # Compare shared secrets to make sure they match and update shared_secrets_match
+    if shared_secret == sender_shared_secret:
+        shared_secrets_match = True
+        print("Shared secrets match")
+    else:
+        shared_secrets_match = False
+        print("Shared secrets do not match")
 
