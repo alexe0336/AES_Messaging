@@ -95,35 +95,35 @@ shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret bac
 print("AES Key:", aes_key)
 
 # Encrypting the file with the AES key
-# file_path = 'test.txt'
-# encrypted_file_path = 'test_encrypted.txt'
-# iv = b'IVkey'  # Hardcoded IV key
-# key = aes_key
+file_path = 'input.txt'
+encrypted_file_path = 'encrypted.txt'
+iv = b'IVkey'  # Hardcoded IV key
+key = aes_key
 
 
 # #Create a function to encrypt the file
-# def encrypt_file(file_path, encrypted_file_path, key, iv):
-#     # Create a cipher object
-#     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-#     encryptor = cipher.encryptor()
+def encrypt_file(file_path, encrypted_file_path, key, iv):
+    # Create a cipher object
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
 
-#     with open(file_path, 'rb') as infile:
-#         with open(encrypted_file_path, 'wb') as outfile:
-#             outfile.write(iv)  # It's common to prepend the IV to the encrypted file
+    with open(file_path, 'rb') as infile:
+        with open(encrypted_file_path, 'wb') as outfile:
+            outfile.write(iv)  # It's common to prepend the IV to the encrypted file
 
-#             while True:
-#                 chunk = infile.read(1024 * 16)  # Read in chunks of 16 bytes
-#                 if len(chunk) == 0:
-#                     break  # End of file
-#                 elif len(chunk) % 16 != 0:
-#                     # Pad the final chunk if necessary
-#                     chunk += b' ' * (16 - len(chunk) % 16)
+            while True:
+                chunk = infile.read(1024 * 16)  # Read in chunks of 16 bytes
+                if len(chunk) == 0:
+                    break  # End of file
+                elif len(chunk) % 16 != 0:
+                    # Pad the final chunk if necessary
+                    chunk += b' ' * (16 - len(chunk) % 16)
                 
-#                 outfile.write(encryptor.update(chunk))
+                outfile.write(encryptor.update(chunk))
             
-#             outfile.write(encryptor.finalize())
+            outfile.write(encryptor.finalize())
 
-# encrypt_file(file_path, encrypted_file_path, aes_key, iv)
+encrypt_file(file_path, encrypted_file_path, aes_key, iv)
 
 
 
