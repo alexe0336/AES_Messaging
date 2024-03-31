@@ -8,11 +8,11 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import serialization
 
     # Libraries for TCP socket API
 import socket
-from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives import hashes
     # RSA library
 from cryptography.hazmat.primitives.asymmetric import rsa
     # HKDF library
@@ -53,7 +53,10 @@ private_key_rsa = rsa.generate_private_key(
 
 public_key_rsa = private_key_rsa.public_key()
 #convert the RSA public key to bytes so it can be sent
-public_key_rsa_bytes = public_key_rsa.public_bytes.to_bytes((public_key_rsa.public_bytes.bit_length() + 7) // 8, 'big')
+public_key_rsa_bytes = public_key_rsa.public_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PublicFormat.SubjectPublicKeyInfo
+)
 
 # Generate Diffie-Hellman private key
 sender_DH_private_key = generate_private_key(p)
