@@ -80,13 +80,13 @@ with conn:
     else:
         shared_secrets_match = False
         print("Shared secrets do not match")
-        
+
 # Setup HKDF parameters for AES key derivation
 hkdf = HKDF(
     algorithm=hashes.SHA256(),
     length=32,
-    salt=0,
-    info=0,
+    salt=b'bytes', # Will convert 'bytes' ASCII characters into a byte value
+    info=b'bytes', # Will convert 'bytes' ASCII characters into a byte value
     backend=default_backend()
 )
 
