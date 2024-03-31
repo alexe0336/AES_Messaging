@@ -39,8 +39,11 @@ receiver_DH_public_key = generate_public_key(g, receiver_DH_private_key, p)
 #     format=serialization.PublicFormat.SubjectPublicKeyInfo
 # )
 
+senderIP = '127.0.0.1' # Set this to the IP of the computer running the sender.py code
+serverPort = 50101 # Set this to the port number the sender.py code is listening on
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-    client_socket.connect(('server_address', 50101))  # Use the server's address
+    client_socket.connect((senderIP, serverPort))  # Use the server's address
     client_socket.sendall(receiver_DH_public_key)  # Send the receiver.py's public key
     sender_DH_public_key = client_socket.recv(1024)  # Receive sender.py's public key
 
