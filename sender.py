@@ -188,27 +188,26 @@ def encrypt_file(file_path, encrypted_file_path, key, iv):
 
 encrypt_file(file_path, encrypted_file_path, aes_key, iv)
 
-conn, addr = server_socket.accept()
+with conn:
+    try:
+        # Sending the encrypted file in chunks
+        with open(encrypted_file_path, 'rb') as file:
+            while chunk := file.read(4096):  # Reading in chunks of 4 KB
+                conn.sendall(chunk)
+        print("Encrypted file sent")
 
-try:
-    # Sending the encrypted file in chunks
-    with open(encrypted_file_path, 'rb') as file:
-        while chunk := file.read(4096):  # Reading in chunks of 4 KB
-            conn.sendall(chunk)
-    print("Encrypted file sent")
+        # Sending IV (assuming it's not too large)
+        conn.sendall(iv)
+        print("IV sent")
 
-    # Sending IV (assuming it's not too large)
-    conn.sendall(iv)
-    print("IV sent")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-except Exception as e:
-    print(f"An error occurred: {e}")
-
-finally:
-    # Clean up
-    conn.close()
-    server_socket.close()
-    print("Connection closed")
+    finally:
+        # Clean up
+        conn.close()
+        server_socket.close()
+        print("Connection closed")
 
 
 
