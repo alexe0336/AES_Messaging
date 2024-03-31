@@ -43,7 +43,7 @@ receiver_DH_public_key = generate_public_key(g, receiver_DH_private_key, p)
 #Public key must be converted to bytes before it can be sent
 receiver_DH_public_key_bytes = receiver_DH_public_key.to_bytes((receiver_DH_public_key.bit_length() + 7) // 8, 'big')
 
-senderIP = '127.0.0.1' # Set this to the IP of the computer running the sender.py code
+senderIP = '10.0.0.92' # Set this to the IP of the computer running the sender.py code
 serverPort = 50101 # Set this to the port number the sender.py code is listening on
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
