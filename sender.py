@@ -34,7 +34,7 @@ def generate_private_key(p):
 # Function to generate Diffie-Hellman public key
 def generate_public_key(g, private_key, p):
     # public_key = g^private_key mod p
-    return pow(g, private_key, p)
+    return int(pow(g, private_key, p))
 
 # Function to compute shared secret key, requires other party's public key
 def compute_shared_secret(other_public_key, private_key, p):
@@ -60,7 +60,7 @@ sender_DH_private_key = generate_private_key(p)
 # Generate Diffie-Hellman public key
 sender_DH_public_key = generate_public_key(g, sender_DH_private_key, p)
 # Public key must be converted to bytes before it can be sent
-sender_DH_public_key_bytes: bytes = sender_DH_public_key.to_bytes((sender_DH_public_key.bit_length() + 7) // 8, 'big')
+sender_DH_public_key_bytes = sender_DH_public_key.to_bytes((sender_DH_public_key.bit_length() + 7) // 8, 'big')
 
 #sender.py RSA signs the DH public key
 signed_DH_public_key_bytes = private_key_rsa.sign(
