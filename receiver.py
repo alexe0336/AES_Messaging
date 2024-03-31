@@ -34,13 +34,6 @@ receiver_DH_private_key = generate_private_key(p)
 # Generate Diffie-Hellman public key
 receiver_DH_public_key = generate_public_key(g, receiver_DH_private_key, p)
 
-#Share the public key with the sender
-# # Assuming `public_key` is the client's (sender's) RSA public key
-# public_key_pem = public_key.public_bytes(
-#     encoding=serialization.Encoding.PEM,
-#     format=serialization.PublicFormat.SubjectPublicKeyInfo
-# )
-
 #Public key must be converted to bytes before it can be sent
 receiver_DH_public_key_bytes = receiver_DH_public_key.to_bytes((receiver_DH_public_key.bit_length() + 7) // 8, 'big')
 
