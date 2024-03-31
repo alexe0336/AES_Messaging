@@ -59,6 +59,9 @@ with conn:
     receiver_DH_public_key = conn.recv(1024)  # Get receiver.py's public key
     conn.sendall(sender_DH_public_key_bytes)  # Send the sender.py's public key.
 
+# Reverting the public key from bytes back to an integer
+receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
+
 #Compute the shared secret
 shared_secret = compute_shared_secret(receiver_DH_public_key, sender_DH_private_key, p)
 print("Shared Secret:", shared_secret)
