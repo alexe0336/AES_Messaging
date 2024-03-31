@@ -176,9 +176,8 @@ while True:
     chunks.append(chunk)
 encrypted_message = b''.join(chunks)
 
-# Assuming IV is sent after the file and is of a known size
-iv_size = 16  # For AES, typically 16 bytes
-iv = client_socket.recv(iv_size)
+# Receive the IV
+iv = client_socket.recv(4096)
 
 cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
 decryptor = cipher.decryptor()
