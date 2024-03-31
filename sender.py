@@ -199,8 +199,10 @@ try:
             print("Encrypted file sent")
 
             # Sending IV (assuming it's not too large)
+            #convert iv to bytes
+            iv = iv.to_bytes((iv.bit_length() + 7) // 8, 'big')
             conn.sendall(iv)
-            print("IV sent")
+            print("IV sent", iv)
 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -215,21 +217,3 @@ except Exception as e:
 finally:
     if server_socket:
         server_socket.close()
-
-
-
-
-
-
-# # Sign the DH public key with RSA
-# rsa_private_key = private_key_rsa
-# signature = rsa_private_key.sign(
-#     public_key_serialized,
-#     padding.PSS(
-#         mgf=padding.MGF1(hashes.SHA256()),
-#         salt_length=padding.PSS.MAX_LENGTH,
-#     ),
-#     hashes.SHA256(),
-# )
-
-# Encrypt the message with 

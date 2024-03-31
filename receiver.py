@@ -181,7 +181,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     encrypted_message = b''.join(chunks)
 
     # Receive the IV
-    iv = client_socket.recv(4096)
+    iv = client_socket.recv(16)
     print("Received IV:", iv)
 
     cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
