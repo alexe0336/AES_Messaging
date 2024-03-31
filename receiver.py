@@ -12,6 +12,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 
     # Libraries for TCP socket API
 import socket
@@ -62,10 +63,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     print("test1")
     sender_signed_DH_public_key = client_socket.recv(1024)  # Receive sender.py's RSA public key
     print("test2")
-    rsa_public_key_bytes = client_socket.recv(4096)  # Receive sender.py's RSA signed DH public key
-    print("test3")
     sender_DH_public_key_bytes = client_socket.recv(4096)  # Receive sender.py's DH public key
     print("test4")
+    rsa_public_key_bytes = client_socket.recv(4096)  # Receive sender.py's RSA signed DH public key
+    print("test3")
+
 
     # Convert the RSA public key from bytes back to an RSA public key object
     # Convert bytes back to an RSA public key object
