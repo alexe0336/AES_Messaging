@@ -58,6 +58,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     client_socket.sendall(receiver_DH_public_key_bytes)  # Send the receiver.py's public key
     sender_DH_public_key = client_socket.recv(1024)  # Receive sender.py's public key
 
+# Revert the public key from sender.py that is in bytes back to an integer
+sender_DH_public_key = int.from_bytes(sender_DH_public_key, 'big')
+
 # Compute shared secret key
 shared_secret = compute_shared_secret(sender_DH_public_key, receiver_DH_private_key, p)
 print("Shared Secret:", shared_secret)
