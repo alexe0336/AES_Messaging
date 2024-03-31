@@ -57,7 +57,7 @@ conn, addr = server_socket.accept()
 with conn:
     print('Connected by', addr)
     receiver_DH_public_key = conn.recv(1024)  # Get receiver.py's public key
-    conn.sendall(sender_DH_public_key)  # Send the sender.py's public key.
+    conn.sendall(sender_DH_public_key_bytes)  # Send the sender.py's public key.
 
 #Compute the shared secret
 shared_secret = compute_shared_secret(receiver_DH_public_key, sender_DH_private_key, p)
