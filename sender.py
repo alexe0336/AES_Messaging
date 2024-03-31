@@ -128,7 +128,8 @@ with conn:
     send_with_length_prefix(conn, shared_secret_bytes)
 
     # Recieve the shared secret from reciever.py and turn it back into an integer
-    receiver_shared_secret = int.from_bytes(conn.recv(1024), 'big')
+    receiver_shared_secret = recv_with_length_prefix(conn)
+    receiver_shared_secret = int.from_bytes(receiver_shared_secret, 'big')
 
     # Compare shared secrets to make sure they match and update shared_secrets_match
     if shared_secret == receiver_shared_secret:
