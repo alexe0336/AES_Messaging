@@ -176,6 +176,7 @@ encrypted_message = b''.join(chunks)
 
 # Receive the IV
 iv = client_socket.recv(4096)
+print("Received IV:", iv)
 
 cipher = Cipher(algorithms.AES(aes_key), modes.CBC(iv), backend=default_backend())
 decryptor = cipher.decryptor()
