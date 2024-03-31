@@ -104,7 +104,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     # Client verifies the signature
     try:
         # Verify the signature
-        rsa_public_key_bytes.verify(
+        rsa_public_key.verify(
             sender_signed_DH_public_key,
             sender_DH_public_key_bytes,  # The original message that was signed
             padding.PSS(
