@@ -158,13 +158,6 @@ shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret bac
 # Print the AES key
 print("AES Key:", aes_key)
 
-while True:
-    try:
-        client_socket.connect((senderIP, serverPort))  # Try to connect to the server
-        break  # If the connection is successful, break out of the loop
-    except ConnectionRefusedError:
-        print("Connection failed. Trying again in 5 seconds...")
-        time.sleep(5)  # Wait for 5 seconds before trying again
 # Receive data until there's no more to receive (for the file)
 chunks = []
 while True:
