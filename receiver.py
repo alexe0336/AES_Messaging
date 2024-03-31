@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
-
+import struct
     # Libraries for TCP socket API
 import socket
 
@@ -38,6 +38,30 @@ def compute_shared_secret(other_public_key, private_key, p):
     # shared_secret = other_public_key^private_key mod p
     return pow(other_public_key, private_key, p)
 
+# Function that sets the receive length of the data incoming
+def recv_with_length_prefix(conn):
+    # Read the length prefix (32-bit integer, 4 bytes)
+    length_prefix = conn.recv(4)
+    if not length_prefix:
+        raise ConnectionError("Connection closed by peer")
+    length = struct.unpack('!I', length_prefix)[0]
+    
+    # Read exactly 'length' bytes
+    data = b''
+    while len(data) < length:
+        chunk = conn.recv(length - len(data))
+        if not chunk:
+            raise ConnectionError("Connection closed by peer")
+        data += chunk
+    return data
+
+# Function that sends the data with a length prefix
+def send_with_length_prefix(client_socket, data):
+    # Prefix each message with its length (32-bit integer, 4 bytes)
+    length_prefix = struct.pack('!I', len(data))
+    client_socket.sendall(length_prefix + data)
+
+
 # Generate Diffie-Hellman private key
 receiver_DH_private_key = generate_private_key(p)
 # Generate Diffie-Hellman public key
@@ -59,14 +83,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             time.sleep(5)  # Wait for 5 seconds before trying again
     print("Connection Succesful")
 
-    client_socket.sendall(receiver_DH_public_key_bytes)  # Send the receiver.py's public key
+
+    # Send receiver.py's DH public key to sender.py, will be sent in bytes
+    send_with_length_prefix(client_socket, receiver_DH_public_key_bytes)
     print("test1")
-    sender_signed_DH_public_key = client_socket.recv(1024)  # Receive sender.py's RSA public key
+    # Receive sender.py's RSA public key
+    sender_signed_DH_public_key = recv_with_length_prefix(client_socket)
     print("test2")
-    sender_DH_public_key_bytes = client_socket.recv(4096)  # Receive sender.py's DH public key
-    print("test4")
-    rsa_public_key_bytes = client_socket.recv(4096)  # Receive sender.py's RSA signed DH public key
+    # Receive sender.py's DH public key
+    sender_DH_public_key_bytes = recv_with_length_prefix(client_socket)
     print("test3")
+    # Receive sender.py's RSA signed DH public key
+    rsa_public_key_bytes = recv_with_length_prefix(client_socket)
+    print("test4")
 
 
     # Convert the RSA public key from bytes back to an RSA public key object

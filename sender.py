@@ -6,7 +6,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import serialization
-
+import struct
     # Libraries for TCP socket API
 import socket
 from cryptography.hazmat.primitives import hashes
@@ -40,6 +40,29 @@ def generate_public_key(g, private_key, p):
 def compute_shared_secret(other_public_key, private_key, p):
     # shared_secret = other_public_key^private_key mod p
     return pow(other_public_key, private_key, p)
+
+# Function that sets the receive length of the data incoming
+def send_with_length_prefix(client_socket, data):
+    # Prefix each message with its length (32-bit integer, 4 bytes)
+    length_prefix = struct.pack('!I', len(data))
+    client_socket.sendall(length_prefix + data)
+
+# Function that sends the data with a length prefix
+def recv_with_length_prefix(client_socket):
+    # Read the length prefix (32-bit integer, 4 bytes)
+    length_prefix = client_socket.recv(4)
+    if not length_prefix:
+        raise ConnectionError("Connection closed by peer")
+    length = struct.unpack('!I', length_prefix)[0]
+    
+    # Read exactly 'length' bytes
+    data = b''
+    while len(data) < length:
+        chunk = client_socket.recv(length - len(data))
+        if not chunk:
+            raise ConnectionError("Connection closed by peer")
+        data += chunk
+    return data
 
 # Generate RSA key pair
 private_key_rsa = rsa.generate_private_key(
@@ -79,13 +102,19 @@ server_socket.listen()
 
 print("Server listening...")
 conn, addr = server_socket.accept()
+
 with conn:
     print('Connected by', addr)
-    receiver_DH_public_key = conn.recv(1024)  # Get receiver.py's public key
-    conn.sendall(public_key_rsa_bytes)  # Send the RSA Public key
-    conn.sendall(sender_DH_public_key_bytes)  # Send sender.py's DH public key
-    conn.sendall(signed_DH_public_key_bytes)  # Send RSA signed DH public key
 
+    # Get receiver.py's public key
+    receiver_DH_public_key = recv_with_length_prefix(conn)
+
+    # Send the RSA Public key
+    send_with_length_prefix(conn, public_key_rsa_bytes)
+    # Send sender.py's DH public key
+    send_with_length_prefix(conn, sender_DH_public_key_bytes)
+    # Send RSA signed DH public key
+    send_with_length_prefix(conn, signed_DH_public_key_bytes)
 
     # Reverting the public key from bytes back to an integer
     receiver_DH_public_key = int.from_bytes(receiver_DH_public_key, 'big')
@@ -95,7 +124,8 @@ with conn:
     print("Shared Secret Sender.py:", shared_secret)
 
     # Send the shared secret to reciever.py
-    conn.sendall(shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big'))
+    shared_secret_bytes = shared_secret.to_bytes((shared_secret.bit_length() + 7) // 8, 'big')
+    send_with_length_prefix(conn, shared_secret_bytes)
 
     # Recieve the shared secret from reciever.py and turn it back into an integer
     receiver_shared_secret = int.from_bytes(conn.recv(1024), 'big')
