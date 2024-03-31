@@ -176,7 +176,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     decryptor = cipher.decryptor()
     decrypted_message = decryptor.update(encrypted_message) + decryptor.finalize()
 
-    print("\nDecrypted Message/File:", decrypted_message.decode())
+    print("\nDecrypted Message/File:\n", decrypted_message.decode())
 
     # Close the socket
     client_socket.close()
