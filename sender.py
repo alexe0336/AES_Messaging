@@ -140,9 +140,9 @@ with conn:
         shared_secrets_match = False
         print("Shared secrets do not match")
 
-# Close the socket
-conn.close()
-server_socket.close()
+# # Close the socket
+# conn.close()
+# server_socket.close()
 
 # Setup HKDF parameters for AES key derivation
 hkdf = HKDF(
@@ -187,12 +187,6 @@ def encrypt_file(file_path, encrypted_file_path, key, iv):
             outfile.write(encryptor.finalize())
 
 encrypt_file(file_path, encrypted_file_path, aes_key, iv)
-
-# Open socket to send encrypted file
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('0.0.0.0', 50101))
-server_socket.listen()
-print("Server listening...")
 
 conn, addr = server_socket.accept()
 

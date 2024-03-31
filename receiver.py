@@ -138,8 +138,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         shared_secrets_match = False
         print("Shared secrets do not match")
 
-# Close the socket
-client_socket.close()
+# # Close the socket
+# client_socket.close()
 
 # Setup HKDF parameters for AES key derivation
 hkdf = HKDF(
@@ -158,8 +158,6 @@ shared_secret = int.from_bytes(shared_secret, 'big') # Convert shared secret bac
 # Print the AES key
 print("AES Key:", aes_key)
 
-#open socket to recieve message
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 while True:
     try:
         client_socket.connect((senderIP, serverPort))  # Try to connect to the server
